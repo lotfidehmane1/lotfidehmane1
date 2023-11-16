@@ -1,65 +1,52 @@
-import 'package:flutter/material.dart';
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-void main() {
- runApp(MyApp());
-}
+import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.TelegramBotsApi;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.generics.BotSession;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-class MyApp extends StatelessWidget {
- @override
- Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter App Home Page'),
-    );
- }
-}
+import java.io.Serializable;
 
-class MyHomePage extends StatefulWidget {
- MyHomePage({Key? key, required this.title}) : super(key: key);
+public class MainActivity extends Activity {
+    EditText etInput;
+    Button btnSend;
+    TelegramBotsApi telegramBotsApi;
+    SendBot sendBot;
 
- final String title;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
- @override
- _MyHomePageState createState() => _MyHomePageState();
-}
+        ApiContextInitializer.init();
 
-class _MyHomePageState extends State<MyHomePage> {
- int _counter = 0;
+        etInput = findViewById(R.id.etInput);
+        btnSend = findViewById(R.id.btnSend);
 
- void _incrementCounter() {
-    setState(() {
-      _counter = _counter + 1;
-    });
- }
+        telegramBotsApi = new TelegramBotsApi();
+        sendBot = new SendBot();
 
- @override
- Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
-    );
- }
-}
+        try {
+            telegramBotsApi.registerBot(sendBot);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = etInput.getText().toString();
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setChatId("@YourChannelOrGroupUsername
+                
